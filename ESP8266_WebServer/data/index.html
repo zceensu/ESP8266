@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        
+        <script>
+            
+            function testWebSocket() {
+                var host = window.location.hostname;
+                console.log("Host: " + host);
+                connection = new WebSocket("ws://" + host + ":81/");
+                connection.onopen = function(evt) {
+                    console.log("CONNECTED");
+                    document.getElementById("RxData").innerHTML = "CONNECTED";
+                };
+                connection.onclose = function(evt) {
+                    console.log("DISCONNECTED");
+                    document.getElementById("RxData").innerHTML = "DISCONNECTED";
+                };
+                connection.onmessage = function(evt) {
+                    console.log('Server: ', evt.data);
+                    document.getElementById("RxData").innerHTML = event.data;
+                };
+                connection.onerror = function(evt) {
+                    console.log("ERROR: " + evt.data);
+                };
+            }
+        
+        function ledFn() {
+            var toSend = "LED";
+            connection.send(toSend);
+        }
+        
+        function battFn() {
+            var toSend = "BATT";
+            connection.send(toSend);
+        }
+        
+        function resetFn() {
+            var toSend = "RESET";
+            connection.send(toSend);
+            document.getElementById("inputSliderPower").value = "0";
+            document.getElementById("outputTextPower").innerHTML="0";
+        }
+        
+        function setSteer(newValue)
+        {
+            document.getElementById("outputTextSteer").innerHTML=newValue;
+            
+            connection.send("s"+newValue);
+        }
+        
+        function setPower(newValue)
+        {
+            document.getElementById("outputTextPower").innerHTML=newValue;
+            
+            connection.send("p"+newValue);
+        }
+        
+        function setRightThreshold(newValue)
+        {
+            document.getElementById("outputTextRight").innerHTML=newValue;
+            
+            connection.send("r"+newValue);
+        }
+        
+        function setLeftThreshold(newValue)
+        {
+            document.getElementById("outputTextLeft").innerHTML=newValue;
+            
+            connection.send("l"+newValue);
+        }
+        
+        function closeSocket()
+        {
+            
+            connection.close();
+        }
+        
+        //window.addEventListener("load", testWebSocket, false);
+            </script>
+        
+    </head>
+    <body style="height=100% width=100%">
+        Bristle Bot<p></p>
+        
+        <input type="button" onclick="testWebSocket()">Connect  <p><p></p>
+            <input type="button" onclick="closeSocket()">Disconnect  <p><p></p>
+                <input type="button" onclick="ledFn()">Blink LED  <p><p></p>
+                    <input type="button" onclick="battFn()">Get Battery Voltage <p><p></p>
+                        <input type="button" onclick="resetFn()">Stop Motors <p></p>
+                            
+                            Left Threshold <input type="range" id= "inputSliderLeft" min="0" max="255" value="128" step="1" oninput="setLeftThreshold(this.value)" /><span id="outputTextLeft">0</span>
+                            <br>
+                            Right Threshold <input type="range" id= "inputSliderRight" min="0" max="255" value="128" step="1" oninput="setRightThreshold(this.value)" /><span id="outputTextRight">0</span>
+                            <br>
+                            
+                            Steer <input type="range" id= "inputSliderSteer" min="0" max="255" value="128" step="1" oninput="setSteer(this.value)" /><span id="outputTextSteer">0</span>
+                            <br>
+                            Power <input type="range" id= "inputSliderPower" min="0" max="255" value="0" step="1" oninput="setPower(this.value)" /><span id="outputTextPower">0</span>
+                            
+                            <br><span id="RxData">data</span>
+                            <br>
+                            
+                            <img src="smiley.png" alt="Smiley face" height="125" width="125">
+                            
+                            </body>
+</html>
